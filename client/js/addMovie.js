@@ -40,58 +40,57 @@ var setGenreList = async () => {
 };
 
 var setSubmit = async () => {
-  document.getElementById("movieForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    let genres = [];
-    let genreCheckBoxes = document.querySelectorAll(".form-check-input");
-    genreCheckBoxes.forEach((genreCheckBox) => {
-      if (genreCheckBox.checked) {
-        genres.push(genreCheckBox.value);
-      }
-    });
-
-    const movie = {
-      title: document.getElementById("title")?.value || null,
-      year: parseInt(document.getElementById("year")?.value) || null,
-      dailyRentalRate:
-        parseFloat(document.getElementById("dailyRentalRate")?.value) || null,
-      discountRate:
-        parseFloat(document.getElementById("discountRate")?.value) || null,
-      genres: genres.length > 0 ? genres : null,
-      imdbRating:
-        parseFloat(document.getElementById("imdbRating")?.value) || null,
-      posterUrl: document.getElementById("posterUrl")?.value || null,
-      bannerUrl: document.getElementById("bannerUrl")?.value || null,
-      plot: document.getElementById("plot")?.value.trim() || null,
-      runtime: document.getElementById("runtime")?.value || null,
-      directedBy: document.getElementById("directedBy")?.value || null,
-      starring: document.getElementById("starring")?.value || null,
-      releaseAt: document.getElementById("releaseAt")?.value || null,
+  document.getElementById("movieForm").addEventListener("submit", async function (event) {
+    event.preventDefault();
+  
+    // Get form values
+    const title = document.getElementById("title").value;
+    const year = document.getElementById("year").value;
+    const dailyRentalRate = document.getElementById("dailyRentalRate").value;
+    const genres = [...document.querySelectorAll('input[name="genre"]:checked')].map(genre => genre.value);
+    const imdbRating = document.getElementById("imdbRating").value;
+    const posterUrl = document.getElementById("posterUrl").value;
+    const bannerUrl = document.getElementById("bannerUrl").value;
+    const plot = document.getElementById("plot").value;
+    const runtime = document.getElementById("runtime").value;
+    const releaseAt = document.getElementById("releaseAt").value;
+    const directedBy = document.getElementById("directedBy").value;
+    const starring = document.getElementById("starring").value;
+  
+    // Prepare movie object
+    const movieData = {
+      title,
+      year,
+      dailyRentalRate,
+      genres,
+      imdbRating,
+      posterUrl,
+      bannerUrl,
+      plot,
+      runtime,
+      releaseAt,
+      directedBy,
+      starring
     };
-
+  
+    // Call the API to add a new movie
     try {
-      const response = await fetch(BASE_MOVIE_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-        body: JSON.stringify(movie),
+      const response = await fetch('/api/movie/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(movieData)
       });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error(
-          `Server responded with error: ${response.status} - ${errorText}`
-        );
-        return;
+  
+      if (response.status === 201) {
+        alert('Movie added successfully!');
+      } else if (response.status === 400) {
+        const errorData = await response.json();
+        alert(errorData.message);
+      } else {
+        alert('Error adding movie.');
       }
-
-      const data = await response.json();
-      console.log("Movie added successfully:", data);
     } catch (error) {
-      console.error("Fetch error:", error);
+      alert('An error occurred while adding the movie.');
     }
   });
 };
