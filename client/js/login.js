@@ -74,3 +74,14 @@ function displayError(message) {
   errorMessage.style.display = "block";
   errorMessage.innerHTML = message;
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+        const passwordInput = document.getElementById("password");
+        const togglePassword = document.getElementById("togglePassword");
+
+        togglePassword.addEventListener("click", () => {
+          const isPasswordVisible = passwordInput.type === "text";
+          passwordInput.type = isPasswordVisible ? "password" : "text";
+          togglePassword.classList.toggle("show", !isPasswordVisible);
+        });
+      });
